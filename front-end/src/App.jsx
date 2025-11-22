@@ -5,6 +5,8 @@ import DashboardCard from "./components/ui/DashboardCard";
 import LineChart from "./components/ui/LineChart";
 import Table from "./components/ui/Table";
 import DoughNutChart from "./components/ui/DoughNutChart";
+import TrafficAnalyzer from "./components/TrafficAnalyzer";
+
 
 function App() {
   const [packets, setPackets] = useState([]);
@@ -74,9 +76,15 @@ function App() {
         <div className="flex justify-start items-start ml-0 pl-0">
           <Table />
         </div>
+        {/* {Traffic analyzer} */}
+        <div className="flex justify-start items-start ml-0 pl-0">
+          <TrafficAnalyzer packets={packets} />
+        </div>
       </div>
     </div>
   );
 }
+
+
 
 export default App;
