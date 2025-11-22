@@ -49,7 +49,9 @@ function App() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Top Nav */}
       <div className="h-[60px] w-full fixed top-0 left-0 flex items-center justify-between border-b border-border bg-card z-20 px-4">
-        <h1 className="font-space_mono text-[22px] text-foreground">NetMon</h1>
+        <h1 className="font-space_mono_bold text-[26px] text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-blue-600 to-purple-600 animate-gradient">
+          NetMon
+        </h1>
         <ThemeToggle />
       </div>
 

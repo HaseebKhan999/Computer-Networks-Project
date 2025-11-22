@@ -50,8 +50,28 @@ function DoughNutChart() {
     return () => clearInterval(interval);
   }, []);
 
-  // Dynamic colors based on theme
-  const textColor = isDarkMode ? "#e5e5e5" : "#333333";
+  // Dynamic colors based on theme - more vibrant and modern
+  const textColor = isDarkMode ? "#e5e5e5" : "#1f2937";
+  
+  // Enhanced color palette - more vibrant
+  const backgroundColors = [
+    "#3b82f6", // TCP - Bright Blue
+    "#f97316", // UDP - Bright Orange
+    "#10b981", // HTTPS - Emerald Green
+    "#06b6d4", // DNS - Cyan
+    "#eab308", // HTTP - Yellow
+    "#ef4444", // Unknown - Red
+  ];
+
+  // Darker borders for better separation
+  const borderColors = [
+    "#2563eb", // TCP
+    "#ea580c", // UDP
+    "#059669", // HTTPS
+    "#0891b2", // DNS
+    "#ca8a04", // HTTP
+    "#dc2626", // Unknown
+  ];
 
   const chartData = {
     labels: ["TCP", "UDP", "HTTPS", "DNS", "HTTP", "Unknown"],
@@ -66,16 +86,12 @@ function DoughNutChart() {
           counts.HTTP,
           counts.Unknown,
         ],
-        backgroundColor: [
-          "#3b82f6", // TCP - Blue
-          "#f97316", // UDP - Orange
-          "#4ade80", // HTTPS - Green
-          "#60a5fa", // DNS - Light Blue
-          "#facc15", // HTTP - Yellow
-          "#f87171", // Unknown - Red
-        ],
+        backgroundColor: backgroundColors,
         borderColor: isDarkMode ? "#1f2937" : "#ffffff",
-        borderWidth: 2,
+        borderWidth: 3,
+        hoverOffset: 15,
+        hoverBorderWidth: 4,
+        hoverBorderColor: isDarkMode ? "#ffffff" : "#000000",
       },
     ],
   };
@@ -92,27 +108,63 @@ function DoughNutChart() {
           color: textColor,
           font: {
             family: "Space_Mono",
+            size: 13,
+            weight: 'bold',
           },
-          padding: 15,
+          padding: 18,
           usePointStyle: true,
+          pointStyle: 'circle',
+          boxWidth: 12,
+          boxHeight: 12,
         },
       },
       tooltip: {
-        backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.9)",
+        backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.95)",
         titleColor: textColor,
         bodyColor: textColor,
-        borderColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-        borderWidth: 1,
+        borderColor: isDarkMode ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.2)",
+        borderWidth: 2,
+        padding: 12,
+        titleFont: {
+          size: 14,
+          weight: 'bold',
+        },
+        bodyFont: {
+          size: 13,
+        },
+        cornerRadius: 8,
+        displayColors: true,
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
       },
+    },
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 1000,
+      easing: 'easeInOutQuart',
     },
   };
 
   return (
-    <div className="w-[400px] h-[450px] py-10 mx-auto rounded-lg border border-border bg-card shadow-md transition-shadow hover:shadow-lg">
-      <Doughnut data={chartData} options={options} />
-      <div className="text-left pb-10 pl-6 font-space_mono pt-8">
-        <h1 className="font-bold text-foreground">Protocol Distribution</h1>
-        <h6 className="text-sm text-muted-foreground">Live Protocol Share</h6>
+    <div className="w-[450px] h-[450px] py-8 mx-auto rounded-xl border-2 border-border bg-card shadow-2xl transition-all duration-300 hover:shadow-[0_20px_50px_rgba(168,_85,_247,_0.15)] hover:scale-[1.01] backdrop-blur-sm">
+      <div className="h-[320px] flex items-center justify-center px-4">
+        <Doughnut data={chartData} options={options} />
+      </div>
+      <div className="text-center px-6 font-space_mono pt-4">
+        <h1 className="font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 dark:from-purple-400 dark:via-pink-400 dark:to-red-400 animate-gradient-x">
+          Protocol Distribution
+        </h1>
+        <h6 className="text-sm text-muted-foreground font-semibold mt-1">
+          Live Protocol Share
+        </h6>
       </div>
     </div>
   );

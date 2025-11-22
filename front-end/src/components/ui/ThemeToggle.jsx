@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from '../../contexts/ThemeContext';
 
 const ThemeToggle = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -7,25 +7,28 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700"
+      className="relative inline-flex h-12 w-24 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-background bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-800 hover:shadow-lg hover:scale-105 shadow-md"
       aria-label="Toggle dark mode"
     >
+      {/* Sliding Circle */}
       <span
-        className={`inline-block h-6 w-6 transform rounded-full bg-white dark:bg-gray-900 transition-transform shadow-lg ${
-          isDarkMode ? 'translate-x-7' : 'translate-x-1'
+        className={`inline-flex h-10 w-10 transform rounded-full bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 transition-all duration-300 shadow-xl border-2 border-gray-200 dark:border-gray-700 items-center justify-center ${
+          isDarkMode ? 'translate-x-12' : 'translate-x-1'
         }`}
       >
+        {/* Moon Icon (Dark Mode) */}
         {isDarkMode ? (
           <svg
-            className="h-6 w-6 text-yellow-400"
+            className="h-6 w-6 text-yellow-400 animate-pulse"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
           </svg>
         ) : (
+          /* Sun Icon (Light Mode) */
           <svg
-            className="h-6 w-6 text-yellow-500"
+            className="h-6 w-6 text-yellow-500 animate-spin-slow"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -37,6 +40,13 @@ const ThemeToggle = () => {
           </svg>
         )}
       </span>
+
+      {/* Optional: Background Glow Effect */}
+      <span className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 ${
+        isDarkMode 
+          ? 'bg-blue-500 opacity-20' 
+          : 'bg-yellow-400 opacity-20'
+      }`} />
     </button>
   );
 };
