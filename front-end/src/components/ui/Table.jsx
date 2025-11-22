@@ -16,47 +16,47 @@ function Table() {
   }, []);
 
   return (
-    <div className="rounded-lg border border-gray-300 bg-white shadow-md transition-shadow hover:shadow-lg w-full">
+    <div className="rounded-lg border border-border bg-card shadow-md transition-shadow hover:shadow-lg w-full">
       <div className="p-4">
-        <h2 className="text-lg font-semibold font-space_mono text-gray-800 mb-1">
+        <h2 className="text-lg font-semibold font-space_mono text-foreground mb-1">
           Recent Packets
         </h2>
-        <p className="text-sm text-gray-500 mb-4 font-space_mono">
+        <p className="text-sm text-muted-foreground mb-4 font-space_mono">
           Live feed of captured packets (latest 50)
         </p>
 
-        <div className="overflow-auto w-full font-space_mono ">
+        <div className="overflow-auto w-full font-space_mono">
           <table className="w-full text-sm border-collapse">
-            <thead className="sticky top-0 z-10 bg-gray-100 border-b border-gray-300  ">
+            <thead className="sticky top-0 z-10 bg-secondary border-b border-border">
               <tr>
-                <th className="text-left font-medium px-4 py-3">Timestamp</th>
-                <th className="text-left font-medium px-4 py-3">Source IP</th>
-                <th className="text-left font-medium px-4 py-3">
+                <th className="text-left font-medium px-4 py-3 text-foreground">Timestamp</th>
+                <th className="text-left font-medium px-4 py-3 text-foreground">Source IP</th>
+                <th className="text-left font-medium px-4 py-3 text-foreground">
                   Destination IP
                 </th>
-                <th className="text-left font-medium px-4 py-3">
+                <th className="text-left font-medium px-4 py-3 text-foreground">
                   Transport Protocol
                 </th>
-                <th className="text-left font-medium px-4 py-2">
+                <th className="text-left font-medium px-4 py-2 text-foreground">
                   Application Protocol
                 </th>
               </tr>
             </thead>
-            <tbody className="">
+            <tbody>
               {packets.map((p, i) => (
                 <tr
                   key={i}
-                  className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="border-b border-border hover:bg-accent transition-colors"
                 >
-                  <td className="px-4 py-3 text-left text-gray-600">{p.time}</td>
-                  <td className="px-4 py-3  text-left font-mono">{p.src_ip}</td>
-                  <td className=" px-4 py-3 text-left font-mono">{p.dest_ip}</td>
+                  <td className="px-4 py-3 text-left text-muted-foreground">{p.time}</td>
+                  <td className="px-4 py-3 text-left font-mono text-foreground">{p.src_ip}</td>
+                  <td className="px-4 py-3 text-left font-mono text-foreground">{p.dest_ip}</td>
                   <td className="px-4 py-3 text-left">
-                    <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                    <span className="inline-flex items-center rounded-md bg-blue-100 dark:bg-blue-900 px-2 py-1 text-xs text-blue-800 dark:text-blue-200">
                       {p.protocol.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-left font-mono">{p.app_layer}</td>
+                  <td className="px-4 py-3 text-left font-mono text-foreground">{p.app_layer}</td>
                 </tr>
               ))}
             </tbody>

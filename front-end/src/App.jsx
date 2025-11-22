@@ -1,12 +1,11 @@
-// App.jsx
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import DashboardCard from "./components/ui/DashboardCard";
 import LineChart from "./components/ui/LineChart";
 import Table from "./components/ui/Table";
 import DoughNutChart from "./components/ui/DoughNutChart";
-import TrafficAnalyzer from "./components/TrafficAnalyzer";
-
+import TrafficAnalyzer from "./components/ui/TrafficAnalyzer";
+import ThemeToggle from "./components/ui/ThemeToggle";
 
 function App() {
   const [packets, setPackets] = useState([]);
@@ -23,6 +22,7 @@ function App() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       fetch("http://127.0.0.1:8000/api/packets/recent/", { method: "POST" })
@@ -46,14 +46,15 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen bg-background text-foreground">
       {/* Top Nav */}
-      <div className="h-[60px] w-full fixed top-0 left-0 flex items-center border-b border-gray-200 bg-white z-20">
-        <h1 className="px-4 font-space_mono text-[22px] text-black">NetMon</h1>
+      <div className="h-[60px] w-full fixed top-0 left-0 flex items-center justify-between border-b border-border bg-card z-20 px-4">
+        <h1 className="font-space_mono text-[22px] text-foreground">NetMon</h1>
+        <ThemeToggle />
       </div>
 
       {/* Content */}
-      <div className="mt-16 -mx-64  space-y-6">
+      <div className="mt-16 -mx-64 space-y-6">
         {/* Dashboard Cards */}
         <div className="flex flex-row gap-6 w-full">
           <DashboardCard
@@ -65,8 +66,8 @@ function App() {
         </div>
 
         {/* Line Chart */}
-        <div className="w-full -mx-10  ">
-          <div className="flex flex-row max-w-[3200px] ">
+        <div className="w-full -mx-10">
+          <div className="flex flex-row max-w-[3200px]">
             <LineChart packets={packets} />
             <DoughNutChart />
           </div>
@@ -76,15 +77,14 @@ function App() {
         <div className="flex justify-start items-start ml-0 pl-0">
           <Table />
         </div>
-        {/* {Traffic analyzer} */}
+
+        {/* Traffic analyzer */}
         <div className="flex justify-start items-start ml-0 pl-0">
           <TrafficAnalyzer packets={packets} />
-        </div>
+        </div>
       </div>
     </div>
   );
 }
-
-
 
 export default App;
