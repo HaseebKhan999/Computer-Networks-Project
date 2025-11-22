@@ -8,11 +8,37 @@ import DoughNutChart from "./components/ui/DoughNutChart";
 
 function App() {
   const [packets, setPackets] = useState([]);
+  const [tcpCount, setTcpCount] = useState(0);
+  const [udpCount, setUdpCount] = useState(0);
+
   useEffect(() => {
     const interval = setInterval(() => {
       fetch("http://127.0.0.1:8000/api/packets/", { method: "POST" })
         .then((res) => res.json())
-        .then((data) => setPackets((prev) => [...prev.slice(-119), data]));
+        .then((data) => {
+          setPackets((prev) => [...prev.slice(-119), data]);
+        });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("http://127.0.0.1:8000/api/packets/recent/", { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          let tcp = 0;
+          let udp = 0;
+
+          data.forEach((p) => {
+            const proto = p.protocol?.toUpperCase();
+            if (proto === "TCP") tcp++;
+            else if (proto === "UDP") udp++;
+          });
+
+          setTcpCount(tcp);
+          setUdpCount(udp);
+          console.log(data);
+        });
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -28,18 +54,19 @@ function App() {
       <div className="mt-16 -mx-64  space-y-6">
         {/* Dashboard Cards */}
         <div className="flex flex-row gap-6 w-full">
-          <DashboardCard title="Packets" value="123,456" />
-          <DashboardCard title="Packets Per Second" value="42" />
-          <DashboardCard title="UDP Packets" value="20" />
-          <DashboardCard title="TCP Packets" value="21" />
+          <DashboardCard
+            title="Packets Per Second"
+            value={packets.length > 0 ? packets[packets.length - 1].count : 0}
+          />
+          <DashboardCard title="UDP Packets" value={udpCount} />
+          <DashboardCard title="TCP Packets" value={tcpCount} />
         </div>
 
         {/* Line Chart */}
         <div className="w-full -mx-10  ">
           <div className="flex flex-row max-w-[3200px] ">
-            
-          <LineChart packets={packets} />
-          <DoughNutChart />
+            <LineChart packets={packets} />
+            <DoughNutChart />
           </div>
         </div>
 

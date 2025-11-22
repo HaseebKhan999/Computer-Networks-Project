@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from scapy.all import sniff,IP,TCP,UDP,DNS
+from scapy.all import sniff,IP,TCP,UDP,DNS,Raw
 from scapy.data import IP_PROTOS
 from .models import Packet
 from datetime import datetime
@@ -50,37 +50,53 @@ def getRecentPackets(request):
             transport_proto = str(proto_num)
 
         app_layer_proto = "Unknown"
+        payload_summary = None
         sport = dport = None
 
         # Extract ports and payload if TCP/UDP
         if TCP in packet:
             sport = packet[TCP].sport
             dport = packet[TCP].dport
-            payload = str(packet[TCP].payload)
+            if Raw in packet:
+                raw_data = packet[Raw].load.decode(errors="ignore")
+                # HTTP detection
+                if raw_data.startswith(("GET", "POST", "PUT", "DELETE")):
+                    app_layer_proto = "HTTP"
+                    lines = raw_data.split("\r\n")
+                    http_info = {}
+                    for line in lines[:10]:
+                        if line.startswith("Host:"):
+                            http_info["host"] = line.split(":", 1)[1].strip()
+                        elif line.startswith(("GET", "POST", "PUT", "DELETE")):
+                            http_info["method"], http_info["path"], _ = line.split()
+                    payload_summary = http_info
+                # SMTP detection
+                elif raw_data.startswith(("EHLO", "HELO", "MAIL FROM", "RCPT TO")):
+                    app_layer_proto = "SMTP"
+                    payload_summary = raw_data.split("\r\n")[:5]
+                else:
+                    payload_summary = raw_data[:100]  # store first 100 chars as fallback
+            else:
+                payload_summary = None
+
         elif UDP in packet:
             sport = packet[UDP].sport
             dport = packet[UDP].dport
-            payload = str(packet[UDP].payload)
-        else:
-            payload = ""
-
-        # 1. Direct common ports mapping
-        if sport in COMMON_PORTS:
-            app_layer_proto = COMMON_PORTS[sport]
-        elif dport in COMMON_PORTS:
-            app_layer_proto = COMMON_PORTS[dport]
-        else:
-            # 2. Ephemeral port heuristic for HTTP/HTTPS
-            if 80 in (sport, dport):
-                app_layer_proto = "HTTP"
-            elif 443 in (sport, dport):
-                app_layer_proto = "HTTPS"
-            # 3. DNS detection
-            elif UDP in packet and 53 in (sport, dport):
+            if DNS in packet:
                 app_layer_proto = "DNS"
-            # 4. HTTP payload inspection (for non-standard ports)
-            elif "HTTP" in payload or payload.startswith("GET") or payload.startswith("POST"):
-                app_layer_proto = "HTTP"
+                dns_layer = packet[DNS]
+                payload_summary = {
+                    "query_name": dns_layer.qd.qname.decode() if dns_layer.qd else None,
+                    "query_type": dns_layer.qd.qtype if dns_layer.qd else None,
+                    "rcode": dns_layer.rcode
+                }
+
+        # Map common ports if app_layer_proto not detected
+        if app_layer_proto == "Unknown":
+            if sport in COMMON_PORTS:
+                app_layer_proto = COMMON_PORTS[sport]
+            elif dport in COMMON_PORTS:
+                app_layer_proto = COMMON_PORTS[dport]
 
         # Prepare data
         data = {
@@ -88,6 +104,7 @@ def getRecentPackets(request):
             "dest_ip": packet[IP].dst,
             "protocol": transport_proto,
             "app_layer": app_layer_proto,
+            "payload_summary": payload_summary
         }
 
         serializer = PacketSerializer(data=data)

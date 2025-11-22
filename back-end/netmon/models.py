@@ -6,4 +6,6 @@ class Packet(models.Model):
     src_ip=models.GenericIPAddressField()
     dest_ip=models.GenericIPAddressField()
     protocol=models.CharField(max_length=10)
+    payload_summary = models.JSONField(blank=True, null=True)
     app_layer=models.CharField(max_length=50, blank=True, null=True)
+
